@@ -1,6 +1,4 @@
-import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
 part 'snake_bloc_event.dart';
 part 'snake_bloc_state.dart';
 
