@@ -1,0 +1,1 @@
+enum SnakePositions {left , right , down, up}
