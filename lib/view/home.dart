@@ -35,11 +35,42 @@ class _HomeViewState extends State<HomeView> {
   }
 
   controllingTheSnakeMovingPosition() {
+    //MOVE THE SNAKE TO THE RIGHT
     if (snakePositions == SnakePositions.right) {
       if (snakePosition.last % 15 == 14) {
         snakePosition.add(snakePosition.last + 1 - 15);
       } else {
         snakePosition.add(snakePosition.last + 1);
+      }
+      snakePosition.remove(snakePosition.first);
+    }
+
+    //MOVE THE SNAKE TO THE DOWN
+    else if (snakePositions == SnakePositions.down) {
+      if (snakePosition.last > 315) {
+        snakePosition.add(snakePosition.last - 314);
+      } else {
+        snakePosition.add(snakePosition.last + 15);
+      }
+      snakePosition.remove(snakePosition.first);
+    }
+
+    //MOVE THE SNAKE POSITION TO LEFT
+    else if (snakePositions == SnakePositions.left) {
+      if (snakePosition.last % 15 == 0) {
+        snakePosition.add(snakePosition.last + 14);
+      } else {
+        snakePosition.add(snakePosition.last - 1);
+      }
+      snakePosition.remove(snakePosition.first);
+    }
+
+    // MOVE THE SANKE TO UPWARD DIRECTION
+    else {
+      if (snakePosition.last < 14) {
+        snakePosition.add(snakePosition.last + 315);
+      } else {
+        snakePosition.add(snakePosition.last - 15);
       }
       snakePosition.remove(snakePosition.first);
     }
@@ -65,6 +96,7 @@ class _HomeViewState extends State<HomeView> {
           snakePositions = SnakePositions.right;
         } else {
           log("left swipe");
+          snakePositions = SnakePositions.left;
         }
 
         setState(() {});
@@ -72,7 +104,10 @@ class _HomeViewState extends State<HomeView> {
       onVerticalDragUpdate: (details) {
         if (details.delta.dy > 0) {
           log("down swipe");
+
+          snakePositions = SnakePositions.down;
         } else {
+          snakePositions = SnakePositions.up;
           log("up swipe");
         }
 
@@ -100,7 +135,9 @@ class _HomeViewState extends State<HomeView> {
                       } else if (snakePosition.contains(index)) {
                         return const Snake();
                       } else {
-                        return const Boxes();
+                        return Boxes(
+                          index: index,
+                        );
                       }
                     }),
               ),
