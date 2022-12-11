@@ -1,117 +1,43 @@
-import 'dart:async';
-import 'dart:developer';
-
+import 'dart:developer' as log;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:snake_game/utils/enums.dart';
 import 'package:snake_game/widgets/food.dart';
 import 'package:snake_game/widgets/snake.box.dart';
 
+import '../controller/snake.controller.dart';
 import '../widgets/snake.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  @override
-  void initState() {
-    super.initState();
-    snakeShape();
-    snakeMoveTimePeriod();
-  }
-
-  int foodPositionIndex = 200;
-  List<int> snakePosition = [];
-  SnakePositions snakePositions = SnakePositions.right;
-
-  //initialize the snake shape
-  snakeShape() {
-    for (int i = 0; i < 3; i++) {
-      snakePosition.add(i);
-    }
-  }
-
-  controllingTheSnakeMovingPosition() {
-    //MOVE THE SNAKE TO THE RIGHT
-    if (snakePositions == SnakePositions.right) {
-      if (snakePosition.last % 15 == 14) {
-        snakePosition.add(snakePosition.last + 1 - 15);
-      } else {
-        snakePosition.add(snakePosition.last + 1);
-      }
-      snakePosition.remove(snakePosition.first);
-    }
-
-    //MOVE THE SNAKE TO THE DOWN
-    else if (snakePositions == SnakePositions.down) {
-      if (snakePosition.last > 315) {
-        snakePosition.add(snakePosition.last - 314);
-      } else {
-        snakePosition.add(snakePosition.last + 15);
-      }
-      snakePosition.remove(snakePosition.first);
-    }
-
-    //MOVE THE SNAKE POSITION TO LEFT
-    else if (snakePositions == SnakePositions.left) {
-      if (snakePosition.last % 15 == 0) {
-        snakePosition.add(snakePosition.last + 14);
-      } else {
-        snakePosition.add(snakePosition.last - 1);
-      }
-      snakePosition.remove(snakePosition.first);
-    }
-
-    // MOVE THE SANKE TO UPWARD DIRECTION
-    else {
-      if (snakePosition.last < 14) {
-        snakePosition.add(snakePosition.last + 315);
-      } else {
-        snakePosition.add(snakePosition.last - 15);
-      }
-      snakePosition.remove(snakePosition.first);
-    }
-
-    setState(() {});
-  }
-
-  snakeMoveTimePeriod() {
-    Timer.periodic(
-      const Duration(seconds: 1),
-      (time) {
-        controllingTheSnakeMovingPosition();
-      },
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final snakeController = Provider.of<SnakeController>(context, listen: true);
+
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
         if (details.delta.dx > 0) {
-          log("Right swipe");
-          snakePositions = SnakePositions.right;
+          log.log("Right swipe");
+          snakeController.snakePositions = SnakePositions.right;
         } else {
-          log("left swipe");
-          snakePositions = SnakePositions.left;
+          log.log("left swipe");
+          snakeController.snakePositions = SnakePositions.left;
         }
 
-        setState(() {});
+        // setState(() {});
       },
       onVerticalDragUpdate: (details) {
         if (details.delta.dy > 0) {
-          log("down swipe");
+          log.log("down swipe");
 
-          snakePositions = SnakePositions.down;
+          snakeController.snakePositions = SnakePositions.down;
         } else {
-          snakePositions = SnakePositions.up;
-          log("up swipe");
+          snakeController.snakePositions = SnakePositions.up;
+          log.log("up swipe");
         }
 
-        setState(() {});
+        // setState(() {});
       },
       child: Scaffold(
         backgroundColor: Colors.black,
@@ -120,26 +46,57 @@ class _HomeViewState extends State<HomeView> {
             Expanded(
               child: Container(
                 color: Colors.black,
-                child: GridView.builder(
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: 330,
-                    shrinkWrap: true,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisSpacing: 2,
-                            crossAxisCount: 15,
-                            mainAxisSpacing: 2),
-                    itemBuilder: (context, index) {
-                      if (index == foodPositionIndex) {
-                        return const Food();
-                      } else if (snakePosition.contains(index)) {
-                        return const Snake();
-                      } else {
-                        return Boxes(
-                          index: index,
-                        );
-                      }
-                    }),
+                child: Column(
+                  children: [
+                    GridView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: 330,
+                        shrinkWrap: true,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisSpacing: 2,
+                                crossAxisCount: 15,
+                                mainAxisSpacing: 2),
+                        itemBuilder: (context, index) {
+                          if (index == snakeController.foodPositionIndex) {
+                            return const Food();
+                          } else if (snakeController.snakePosition
+                              .contains(index)) {
+                            return const Snake();
+                          } else {
+                            return const Boxes();
+                          }
+                        }),
+                    const Spacer(),
+                    Consumer<SnakeController>(
+                      builder: (context, controller, child) {
+                        return controller.gameStarted == true
+                            ? const SizedBox.shrink()
+                            : MaterialButton(
+                                textColor: Colors.black,
+                                color: Colors.white,
+                                onPressed: () {
+                                  controller. snakeMoveTimePeriod();
+                                },
+                                child: const Text("Start game"),
+                              );
+                      },
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Text(
+                      "Score : ${snakeController.score}",
+                      style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white),
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

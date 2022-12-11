@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 class Boxes extends StatelessWidget {
-  final int index;
-  const Boxes({super.key, required this.index});
+  const Boxes({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
-
-      child: Text(index.toString() ,style: const TextStyle(color: Colors.black),),
+      decoration: BoxDecoration(
+         borderRadius: BorderRadius.circular(8)),
     );
   }
 }

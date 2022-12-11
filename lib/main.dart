@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:snake_game/theme/theme.dart';
+import 'package:provider/provider.dart';
+import 'package:snake_game/controller/snake.controller.dart';
 import 'package:snake_game/view/home.dart';
 
 void main() {
@@ -11,12 +12,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      darkTheme: customDarkTheme(),
-      theme: customLightTheme(),
-      themeMode: ThemeMode.system,
-      title: 'Snake game',
-      home: const HomeView(),
+    return ChangeNotifierProvider(
+      create: (context) => SnakeController(),
+      child: const MaterialApp(
+        themeMode: ThemeMode.system,
+        title: 'Snake game',
+        home: HomeView(),
+      ),
     );
   }
 }

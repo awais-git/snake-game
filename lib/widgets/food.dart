@@ -5,9 +5,8 @@ class Food extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: const CircleAvatar(
+    return const SizedBox(
+      child: CircleAvatar(
         backgroundColor: Colors.green,
       ),
     );
